@@ -15,7 +15,7 @@ public class CarDameReceiver : DameReceiver
         base.Receiver(damage);
         if (this.IsDeal())
         {
-            Debug.Log("Deal");
+            Debug.Log("Xe Hong Roi");
             this.carMove.speedMax = 0;
         }
     }

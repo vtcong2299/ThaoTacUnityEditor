@@ -5,8 +5,9 @@ using UnityEngine;
 
 public class CarMove : MonoBehaviour
 {
-    public Rigidbody rb;
-    public CarStatus status;
+    protected Rigidbody rb;
+    protected CarStatus status;
+    protected DameReceiver dameReceiver;
     public int speedCar = 1;
     public int speed = 1;
     public int speedMax = 15;
@@ -19,6 +20,7 @@ public class CarMove : MonoBehaviour
     {
         this.rb = GetComponent<Rigidbody>();
         this.status = GetComponent<CarStatus>();
+        this.dameReceiver = GetComponent<DameReceiver>();
     }
     private void FixedUpdate()
     {
@@ -28,13 +30,16 @@ public class CarMove : MonoBehaviour
     {
         this.pressVertical = Input.GetAxis("Vertical");
         this.pressHorizontal = Input.GetAxis("Horizontal");
-        if(this.status.checkInCity%2==0)
+        if (!this.dameReceiver.IsDeal() && this.status.capacity > 0)
         {
-            this.speedMax = 15;
-        }
-        else
-        {
-            this.speedMax = 10;
+            if (this.status.checkInCity % 2 == 0)
+            {
+                this.speedMax = 13;                
+            }
+            else
+            {
+                this.speedMax = 7;               
+            }
         }
     }
     public void UpdateSpeed()
