@@ -10,7 +10,12 @@ public class CarMoveAuto : MonoBehaviour
     public AudioSource audioSource;
     public AudioClip runClip;
     public Vector3[] Point;
+    public LayerMask enemyLayer;
     #region SetupField
+    [SerializeField]
+    private int hp = 100;
+    [SerializeField]
+    private int damage = 5;
     [SerializeField]
     private float defaultSpeed = 10;
     [SerializeField]
@@ -25,6 +30,8 @@ public class CarMoveAuto : MonoBehaviour
     [SerializeField]
     private float speed;
     float elapsedTime;
+    [SerializeField]
+    //float distanse = 5f;
     const float DELTA_ANGLE = 2;
     Quaternion targetQuarternion;
     Quaternion startQuarternion;
@@ -33,12 +40,13 @@ public class CarMoveAuto : MonoBehaviour
         audioSource = gameObject.AddComponent<AudioSource>();  
         audioSource.clip = runClip;
         speed = defaultSpeed;
-        SetTarget();
+        SetTarget();        
     }
     private void Update()
     {      
         //Tính toán liên tục hướng xe đến đích
         CalculateDirectionToTarget();
+        //CalculateStartTargetQuarternion();
         if (IsReachTarget())
         {
             OnReachTarget();
@@ -46,6 +54,8 @@ public class CarMoveAuto : MonoBehaviour
         //Điểu chỉnh hướng xe đến khi trùng với hướng đến đích
         LerpDirectionToTarget();
         MoveForward();
+        CheckCollide();
+        IsDeal();
         audioSource.Play();
     }
     //Các việc thực hiện khi chạm đến điểm đích
@@ -134,5 +144,33 @@ public class CarMoveAuto : MonoBehaviour
     {
         directionToTarget = targetPos - transform.position;
     }
-   
+    private void OnTriggerEnter(Collider other)
+    {
+        if(other.gameObject.tag == "Enemy")
+        { 
+            hp -= damage;
+            Debug.Log("Va cham");
+        }
+    }
+    public void IsDeal()
+    {
+        if (hp == 0)
+        {
+            speed = 0;
+        }
+    }
+    public void CheckCollide()
+    {
+        Ray ray = new Ray(transform.position, transform.forward);
+        RaycastHit hit;
+        if (Physics.Raycast(ray, out hit, Mathf.Infinity, enemyLayer))
+        {
+            if (hit.distance <= 5f)
+            {
+                
+                Debug.Log("Phia truoc co vat can");
+            }
+        }
+        
+    }
 }
