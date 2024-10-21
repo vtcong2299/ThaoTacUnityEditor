@@ -5,19 +5,38 @@ using UnityEngine;
 
 public class CarMove : MonoBehaviour
 {
+    public static CarMove instance;
     protected Rigidbody rb;
     protected CarStatus status;
-    protected DameReceiver dameReceiver;
+    public DameReceiver dameReceiver;
     public int speedCar = 1;
-    public int speed = 1;
+    [SerializeField]
+    private int speed = 1;    
     public int speedMax = 15;
-    public int speedRotateRight = 50;
-    public int speedRotateLeft = -50;
-    public float pressHorizontal = 0f;
-    public float pressVertical = 0f;
-    public bool isCarMove = false;
+    [SerializeField]
+    private int speedRotateRight = 50;
+    [SerializeField]
+    private int speedRotateLeft = -50;
+    [SerializeField]
+    private float pressHorizontal = 0f;
+    [SerializeField]
+    private float pressVertical = 0f;
+    public bool isCarMove = false;    
+    private AudioSource audioSource;
+    [SerializeField]
+    private AudioClip runClip;
+    private void OnEnable()
+    {
+        instance = this;
+    }
+    private void OnDisable()
+    {
+        instance = null;
+    }
     private void Start()
     {
+        audioSource = gameObject.AddComponent<AudioSource>();
+        audioSource.clip = runClip;
         this.rb = GetComponent<Rigidbody>();
         this.status = GetComponent<CarStatus>();
         this.dameReceiver = GetComponent<DameReceiver>();
@@ -28,9 +47,9 @@ public class CarMove : MonoBehaviour
     }
     private void Update()
     {
-        this.pressVertical = Input.GetAxis("Vertical");
-        this.pressHorizontal = Input.GetAxis("Horizontal");
-        if (!this.dameReceiver.IsDeal() && this.status.capacity > 0)
+        //this.pressVertical = Input.GetAxis("Vertical");
+        //this.pressHorizontal = Input.GetAxis("Horizontal");
+        if (!this.dameReceiver.IsDead() && this.status.capacity > 0)
         {
             if (this.status.checkInCity % 2 == 0)
             {
@@ -40,6 +59,43 @@ public class CarMove : MonoBehaviour
             {
                 this.speedMax = 7;               
             }
+        }
+    }
+    public void NoPressUpDown()
+    {
+        pressVertical = 0f;
+        pressHorizontal = 0f;
+        audioSource.Stop();
+    }
+    public void NoPressLeftRight()
+    {
+        pressHorizontal = 0f;
+    }
+    public void PressUp()
+    {
+        this.pressVertical = 1;
+        StartCoroutine(CallFunctionEveryInterval());
+    }
+    public void PressDown()
+    {
+        this.pressVertical = -1;
+        StartCoroutine(CallFunctionEveryInterval());
+    }
+    public void PressLeft()
+    {
+        this.pressHorizontal = -1;
+    }
+    public void PressRight()
+    {
+        this.pressHorizontal = 1;
+    }
+    IEnumerator CallFunctionEveryInterval()
+    {
+        audioSource.Play();
+        while (true)
+        {
+            yield return new WaitForSeconds(19f);
+            audioSource.Play();
         }
     }
     public void UpdateSpeed()

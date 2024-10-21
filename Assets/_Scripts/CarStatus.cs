@@ -5,12 +5,14 @@ using UnityEngine;
 public class CarStatus : MonoBehaviour
 {
     protected CarMove carMove;
-    public float capacity = 100;
+    protected CarDameReceiver dameReceiver;
+    public float capacity = 1000;
     public int checkInCity = 0;
     protected int check;
     public int countDuongDua = 0;    
     public int countDich = 0;
     private int soSanh;
+    public int coins = 0;
     private void Start()
     {
         this.carMove = GetComponent<CarMove>();
@@ -27,10 +29,11 @@ public class CarStatus : MonoBehaviour
     {
         if (this.soSanh != this.countDich)
         {
-            if (this.countDuongDua == this.countDich)
+            if (this.countDuongDua >= this.countDich)
             {
                 Debug.Log("Vong Dua Thu: " + (this.countDich + 1));
                 this.soSanh = this.countDich;
+                UIManager.instance?.OnLapsChange(countDich);
             }
         }
     }
@@ -39,8 +42,10 @@ public class CarStatus : MonoBehaviour
         if(this.carMove.isCarMove)
         {
             this.capacity -= 1f* this.carMove.speedCar*Time.fixedDeltaTime;
+            UIManager.instance.OnFuleChange(capacity);
             if (this.capacity <= 0f)
             {
+                UIManager.instance.EndGame((int)capacity);
                 this.carMove.speedMax = 0;
             }
         }
@@ -73,6 +78,16 @@ public class CarStatus : MonoBehaviour
         if (collider.gameObject.tag == "TramXang")
         {
             this.capacity = 1000;
+            Debug.Log("Do xang");
+        }
+    }
+    protected void Coins(Collider collider)
+    {
+        if (collider.gameObject.tag == "Coins")
+        {
+            coins++;
+            Destroy(collider.gameObject);
+            UIManager.instance?.OnCoinsChange(coins);
         }
     }
     public virtual void OnTriggerEnter(Collider collider)
@@ -80,6 +95,7 @@ public class CarStatus : MonoBehaviour
        this.CheckFule(collider);
        this.CheckInCity(collider);
        this.CheckLaps(collider);
+       this.Coins(collider);
     }
     
 }

@@ -26,5 +26,20 @@ public class DameSender : MonoBehaviour
             return;
         }
     }
+    public virtual void ColliderAutoSendDame(Collider collision)
+    {
+        if (dameReceiver != null)
+        {
+            dameReceiver.Receiver(damage);
+        }
+        else
+        {
+            return;
+        }
+    }
+    public void OnTriggerEnter(Collider other)
+    {
+        this.ColliderAutoSendDame(other);
+    }
 }
    

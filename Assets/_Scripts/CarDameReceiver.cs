@@ -8,13 +8,15 @@ public class CarDameReceiver : DameReceiver
     private void Start()
     {
         this.hp = 100;
+        OnHpChange();
         this.carMove =GetComponent<CarMove>();
     }
     public override void Receiver(int damage)
     {
         base.Receiver(damage);
-        if (this.IsDeal())
+        if (this.IsDead())
         {
+            UIManager.instance.EndGame(hp);
             Debug.Log("Xe Hong Roi");
             this.carMove.speedMax = 0;
         }
